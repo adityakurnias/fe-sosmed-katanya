@@ -59,6 +59,7 @@ button {
   font-size: 0.875rem;
   font-weight: 500;
   transition: background-color 0.2s;
+  cursor: pointer;
 }
 
 .following {

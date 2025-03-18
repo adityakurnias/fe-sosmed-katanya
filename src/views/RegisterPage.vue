@@ -1,39 +1,39 @@
 <script setup lang="ts">
-import { ref } from 'vue';
-import { useRouter } from 'vue-router';
+import { ref } from "vue";
+import { useRouter } from "vue-router";
 
 const router = useRouter();
-const fullName = ref('');
-const username = ref('');
-const password = ref('');
-const confirmPassword = ref('');
-const errorMessage = ref('');
+const fullName = ref("");
+const username = ref("");
+const password = ref("");
+const confirmPassword = ref("");
+const errorMessage = ref("");
 const isLoading = ref(false);
 
 const register = async () => {
-  errorMessage.value = '';
+  errorMessage.value = "";
 
   if (!fullName.value || !username.value || !password.value) {
-    errorMessage.value = 'Semua field harus diisi';
+    errorMessage.value = "Semua field harus diisi";
     return;
   }
 
   if (password.value !== confirmPassword.value) {
-    errorMessage.value = 'Password tidak cocok';
+    errorMessage.value = "Password tidak cocok";
     return;
   }
 
   if (password.value.length < 6) {
-    errorMessage.value = 'Password minimal 6 karakter';
+    errorMessage.value = "Password minimal 6 karakter";
     return;
   }
 
   isLoading.value = true;
 
   try {
-    const response = await fetch('http://localhost:8000/api/v1/auth/register', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+    const response = await fetch("/api/auth/register", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         full_name: fullName.value,
         username: username.value,
@@ -44,29 +44,29 @@ const register = async () => {
     const data = await response.json();
 
     if (!response.ok) {
-      throw new Error(data.message || 'Registrasi gagal');
+      throw new Error(data.message || "Registrasi gagal");
     }
 
-    const loginResponse = await fetch('http://localhost:8000/api/v1/auth/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+    const loginResponse = await fetch("/api/auth/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         username: username.value,
-        password: password.value
+        password: password.value,
       }),
     });
 
     const loginData = await loginResponse.json();
 
     if (!loginResponse.ok) {
-      throw new Error(loginData.message || 'Auto login gagal');
+      throw new Error(loginData.message || "Auto login gagal");
     }
 
-    localStorage.setItem('token', loginData.token);
-    localStorage.setItem('user', JSON.stringify(loginData.user));
+    localStorage.setItem("token", loginData.token);
+    localStorage.setItem("user", JSON.stringify(loginData.user));
 
-    router.push('/');
-  } catch (error) {
+    router.push("/");
+  } catch (error: any) {
     errorMessage.value = error.message;
   } finally {
     isLoading.value = false;
@@ -128,7 +128,7 @@ const register = async () => {
       </div>
 
       <button type="submit" :disabled="isLoading" class="submit-button">
-        {{ isLoading ? 'Memproses...' : 'Daftar' }}
+        {{ isLoading ? "Memproses..." : "Daftar" }}
       </button>
     </form>
 
@@ -230,5 +230,11 @@ input:focus {
 
 .auth-switch a:hover {
   text-decoration: underline;
+}
+
+@media (max-width: 768px) {
+  .auth-container {
+    width: 90%;
+  }
 }
 </style>

@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
-import FollowButton from '@/components/FollowButton.vue';
+import { ref, onMounted } from "vue";
+import { useRoute, useRouter } from "vue-router";
+import FollowButton from "@/components/FollowButton.vue";
 
 interface Attachment {
   id: number;
@@ -21,7 +21,7 @@ interface User {
   full_name: string;
   bio: string | null;
   is_private: boolean;
-  follow_status?: 'following' | 'requested' | null;
+  follow_status?: "following" | "requested" | null;
   posts_count: number;
   followers_count: number;
   following_count: number;
@@ -32,43 +32,44 @@ const route = useRoute();
 const router = useRouter();
 const user = ref<User | null>(null);
 const isLoading = ref(true);
-const error = ref('');
+const error = ref("");
 const currentUser = ref<any>(null);
 
 const fetchUserProfile = async () => {
   const username = route.params.username as string;
-  const token = localStorage.getItem('token');
+  const token = localStorage.getItem("token");
 
   if (!token) {
-    router.push('/login');
+    router.push("/login");
     return;
   }
 
   try {
-    const response = await fetch(`http://localhost:8000/api/v1/users/${username}`, {
+    const response = await fetch(`/api/users/${username}`, {
       headers: {
-        'Authorization': `Bearer ${token}`,
+        Authorization: `Bearer ${token}`,
       },
     });
 
     if (!response.ok) {
       const errorData = await response.json();
-      throw new Error(errorData.message || 'Failed to fetch user profile');
+      throw new Error(errorData.message || "Failed to fetch user profile");
     }
 
     const data = await response.json();
     user.value = data.user;
   } catch (err: any) {
-    console.error('Error fetching profile:', err);
+    console.error("Error fetching profile:", err);
     error.value = err.message;
   } finally {
     isLoading.value = false;
   }
 };
 
-const handleFollowStatusChange = (status: 'following' | 'requested' | null) => {
+const handleFollowStatusChange = (status: "following" | "requested" | null) => {
   if (user.value) {
     user.value.follow_status = status;
+    fetchUserProfile();
   }
 };
 
@@ -86,7 +87,13 @@ const formatDate = (dateString: string): string => {
 };
 
 const getImageUrl = (path: string): string => {
-  return `http://localhost:8000/storage/${path}`;
+  return `/storage/${path}`;
+};
+
+const logout = () => {
+  localStorage.removeItem("token");
+  localStorage.removeItem("user");
+  router.push("/login");
 };
 
 onMounted(() => {
@@ -102,10 +109,8 @@ onMounted(() => {
 <template>
   <div class="profile-container">
     <div class="header-section">
-      <button @click="router.push('/')" class="back-button">
-        ← Kembali
-      </button>
-      <h1>Profile</h1>
+      <a @click="router.push('/')" class="back-button"> ← Kembali </a>
+      <button class="logout" @click="logout">Logout</button>
     </div>
 
     <div v-if="isLoading" class="loading-container">
@@ -129,7 +134,10 @@ onMounted(() => {
           </div>
         </div>
 
-        <div v-if="currentUser && currentUser.username !== user.username" class="follow-container">
+        <div
+          v-if="currentUser && currentUser.username !== user.username"
+          class="follow-container"
+        >
           <FollowButton
             :username="user.username"
             :initial-status="user.follow_status"
@@ -161,8 +169,15 @@ onMounted(() => {
               <span class="post-date">{{ formatDate(post.created_at) }}</span>
             </div>
             <p class="post-caption">{{ post.caption }}</p>
-            <div v-if="post.attachments && post.attachments.length > 0" class="post-attachments">
-              <div v-for="attachment in post.attachments" :key="attachment.id" class="attachment">
+            <div
+              v-if="post.attachments && post.attachments.length > 0"
+              class="post-attachments"
+            >
+              <div
+                v-for="attachment in post.attachments"
+                :key="attachment.id"
+                class="attachment"
+              >
                 <img
                   :src="getImageUrl(attachment.storage_path)"
                   :alt="`Attachment for post ${post.id}`"
@@ -174,11 +189,24 @@ onMounted(() => {
         </div>
       </div>
 
-      <div v-else-if="user.is_private && user.follow_status !== 'following' && currentUser.username !== user.username" class="private-message">
-        <p>Akun ini private. Anda perlu mengikuti user ini untuk melihat postingannya.</p>
+      <div
+        v-else-if="
+          user.is_private &&
+          user.follow_status !== 'following' &&
+          currentUser.username !== user.username
+        "
+        class="private-message"
+      >
+        <p>
+          Akun ini private. Anda perlu mengikuti user ini untuk melihat
+          postingannya.
+        </p>
       </div>
 
-      <div v-else-if="user.posts && user.posts.length === 0" class="empty-posts">
+      <div
+        v-else-if="user.posts && user.posts.length === 0"
+        class="empty-posts"
+      >
         <p>Belum ada postingan.</p>
       </div>
     </div>
@@ -196,6 +224,7 @@ onMounted(() => {
 .header-section {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   margin-bottom: 1.5rem;
 }
 
@@ -213,7 +242,8 @@ h1 {
   margin: 0;
 }
 
-.loading-container, .error-container {
+.loading-container,
+.error-container {
   background-color: #222;
   border-radius: 8px;
   padding: 2rem;
@@ -244,7 +274,7 @@ h1 {
 .profile-header {
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
+  align-items: center;
   margin-bottom: 1.5rem;
 }
 
@@ -362,11 +392,27 @@ h1 {
   object-fit: contain;
 }
 
-.private-message, .empty-posts {
+.private-message,
+.empty-posts {
   background-color: #2d3748;
   border-radius: 8px;
   padding: 2rem;
   text-align: center;
   color: #9ca3af;
+}
+
+.logout {
+  background-color: #d32f2f;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 0.5rem 1rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.logout:hover {
+  background-color: #b71c1c;
 }
 </style>

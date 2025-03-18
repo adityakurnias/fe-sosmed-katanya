@@ -20,7 +20,7 @@ const login = async () => {
   isLoading.value = true;
 
   try {
-    const response = await fetch("http://localhost:8000/api/v1/auth/login", {
+    const response = await fetch("/api/auth/login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -30,6 +30,7 @@ const login = async () => {
     });
 
     const data = await response.json();
+    console.log(data);
 
     if (!response.ok) {
       throw new Error(data.message || "Login gagal");
@@ -220,5 +221,11 @@ input[type="checkbox"] {
 
 .auth-switch a:hover {
   text-decoration: underline;
+}
+
+@media (max-width: 768px) {
+  .auth-container {
+    width: 90%;
+  }
 }
 </style>

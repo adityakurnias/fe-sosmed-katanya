@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import router from "@/router";
 import { ref, onMounted } from "vue";
+import NavigationBar from "@/components/NavigationBar.vue";
 
 interface Attachment {
   id: number;
@@ -39,6 +40,7 @@ const isSubmitting = ref(false);
 const errorMessage = ref("");
 const selectedFiles = ref<File[]>([]);
 const filePreviews = ref<string[]>([]);
+const ascending = ref(true);
 
 const formatDate = (dateString: string): string => {
   const dateObj = new Date(dateString);
@@ -57,7 +59,7 @@ const formatDate = (dateString: string): string => {
 };
 
 const getImageUrl = (path: string): string => {
-  return `http://localhost:8000/storage/${path}`;
+  return `/storage/${path}`;
 };
 
 const fetchPosts = async () => {
@@ -70,7 +72,7 @@ const fetchPosts = async () => {
       throw new Error("Token tidak ada");
     }
 
-    const response = await fetch("http://localhost:8000/api/v1/posts", {
+    const response = await fetch("/api/posts", {
       headers: {
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
@@ -85,7 +87,8 @@ const fetchPosts = async () => {
     posts.value = data.posts;
   } catch (error: any) {
     console.error("Error fetching posts:", error);
-    errorMessage.value = error.message || "Terjadi kesalahan saat memuat postingan";
+    errorMessage.value =
+      error.message || "Terjadi kesalahan saat memuat postingan";
   } finally {
     isLoading.value = false;
   }
@@ -112,17 +115,15 @@ const removeSelectedFile = (index: number) => {
   filePreviews.value.splice(index, 1);
 };
 
-const logout = () => {
-  localStorage.removeItem("token");
-  localStorage.removeItem("user");
-  router.push("/login");
-};
-const profile = () => {
-  const userData = localStorage.getItem("user");
-  if (userData) {
-    const user = JSON.parse(userData);
-    router.push(`/profile/${user.username}`);
-  }
+const sortPosts = () => {
+  posts.value.sort((a, b) => {
+    const dateA = new Date(a.created_at);
+    const dateB = new Date(b.created_at);
+    return ascending.value
+      ? dateA.getTime() - dateB.getTime()
+      : dateB.getTime() - dateA.getTime();
+  });
+  ascending.value = !ascending.value;
 };
 
 const createPost = async () => {
@@ -146,7 +147,7 @@ const createPost = async () => {
       formData.append("post_attachments[]", file);
     });
 
-    const response = await fetch("http://localhost:8000/api/v1/posts", {
+    const response = await fetch("/api/posts", {
       method: "POST",
       headers: {
         Authorization: `Bearer ${token}`,
@@ -165,7 +166,8 @@ const createPost = async () => {
     await fetchPosts();
   } catch (error: any) {
     console.error("Error creating post:", error);
-    errorMessage.value = error.message || "Terjadi kesalahan saat membuat postingan";
+    errorMessage.value =
+      error.message || "Terjadi kesalahan saat membuat postingan";
   } finally {
     isSubmitting.value = false;
   }
@@ -183,11 +185,16 @@ onMounted(() => {
 
 <template>
   <div class="home-container">
+    <NavigationBar />
+
     <section class="welcome-section">
-      <h1>Selamat Datang, {{ user ? (user as unknown as User).full_name : "Pengguna" }}!</h1>
-      <p class="welcome-text">Simple Social Media, Posting Posting Posting!!!!</p>
-      <button class="logout" @click="logout">Logout</button>
-      <button class="profile" @click="profile">Profile</button>
+      <h1>
+        Selamat Datang,
+        {{ user ? (user as unknown as User).full_name : "Pengguna" }}!
+      </h1>
+      <p class="welcome-text">
+        Simple Social Media, Posting Posting Posting!!!!
+      </p>
     </section>
 
     <div v-if="errorMessage" class="error-message">
@@ -206,9 +213,18 @@ onMounted(() => {
 
         <div class="attachment-section">
           <div v-if="filePreviews.length > 0" class="file-preview-container">
-            <div v-for="(preview, index) in filePreviews" :key="index" class="file-preview">
+            <div
+              v-for="(preview, index) in filePreviews"
+              :key="index"
+              class="file-preview"
+            >
               <img :src="preview" alt="Preview" class="preview-image" />
-              <button @click="removeSelectedFile(index)" class="remove-file-btn">×</button>
+              <button
+                @click="removeSelectedFile(index)"
+                class="remove-file-btn"
+              >
+                ×
+              </button>
             </div>
           </div>
 
@@ -231,7 +247,9 @@ onMounted(() => {
         <div class="post-actions">
           <button
             @click="createPost"
-            :disabled="isSubmitting || (!newPostContent.trim() && !selectedFiles.length)"
+            :disabled="
+              isSubmitting || (!newPostContent.trim() && !selectedFiles.length)
+            "
             class="post-btn"
           >
             {{ isSubmitting ? "Memposting..." : "Posting" }}
@@ -241,7 +259,12 @@ onMounted(() => {
     </section>
 
     <section class="feed-section">
-      <h2>Postingan Terbaru</h2>
+      <div class="feed-header">
+        <h2>Postingan Terbaru</h2>
+        <button @click="sortPosts">
+          {{ ascending ? "Terlama" : "Terbaru" }}
+        </button>
+      </div>
 
       <div v-if="isLoading" class="loading">
         <p>Memuat postingan...</p>
@@ -260,7 +283,9 @@ onMounted(() => {
               </div>
               <div>
                 <strong class="post-author"
-                  ><a :href="`/profile/${post.user.username}`">{{ post.user.full_name }}</a></strong
+                  ><a :href="`/profile/${post.user.username}`">{{
+                    post.user.full_name
+                  }}</a></strong
                 >
                 <div class="post-username">@{{ post.user.username }}</div>
               </div>
@@ -270,7 +295,10 @@ onMounted(() => {
 
           <p class="post-content">{{ post.caption }}</p>
 
-          <div v-if="post.attachments && post.attachments.length > 0" class="post-attachments">
+          <div
+            v-if="post.attachments && post.attachments.length > 0"
+            class="post-attachments"
+          >
             <div
               v-for="attachment in post.attachments"
               :key="attachment.id"
@@ -401,9 +429,9 @@ h1 {
 
 .create-post,
 .feed-section {
-  max-width: 800px; /* Batasi lebar konten */
-  width: 90%; /* Sesuaikan dengan lebar layar */
-  margin-top: 2rem; /* Tambahkan margin atas */
+  max-width: 800px;
+  width: 90%;
+  margin-top: 2rem;
 }
 
 h2 {
@@ -417,6 +445,7 @@ h2 {
   text-align: center;
   padding: 2rem;
   background-color: #222;
+  min-width: 100%;
   border-radius: 8px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   color: whitesmoke;
@@ -425,7 +454,24 @@ h2 {
 .posts-container {
   display: flex;
   flex-direction: column;
+  min-width: 100%;
   gap: 1rem;
+}
+
+.feed-header {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.feed-header button {
+  color: whitesmoke;
+  background-color: #222;
+  border: none;
+  padding: 8px;
+  cursor: pointer;
+  border-radius: 6px;
 }
 
 .post-card {
@@ -462,9 +508,14 @@ h2 {
 }
 
 .post-author a {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+  text-overflow: ellipsis;
   color: white;
   font-size: 1rem;
-  display: block;
   font-weight: bold;
   text-decoration: none;
 }
@@ -479,6 +530,9 @@ h2 {
 }
 
 .post-time {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   color: whitesmoke;
   font-size: 0.875rem;
 }
@@ -570,33 +624,19 @@ h2 {
   font-size: 1.2rem;
 }
 
-.logout {
-  background-color: #d32f2f;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  padding: 0.5rem 1rem;
-  font-size: 0.9rem;
-  font-weight: 600;
-  cursor: pointer;
-  margin-top: 1rem;
-  margin-right: 0.2rem;
+@media (max-width: 768px) {
+  .home-container {
+    min-width: 60%;
+  }
 }
 
-.profile {
-  background-color: green;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  padding: 0.5rem 1rem;
-  font-size: 0.9rem;
-  font-weight: 600;
-  cursor: pointer;
-  margin-top: 1rem;
-  margin-left: 0.2rem;
-}
+@media (max-width: 480px) {
+  .post-author a{
+    max-width: 30vw;
+  }
 
-.logout:hover {
-  background-color: #b71c1c;
+  .post-time {
+    max-width: 30vw;
+  }
 }
 </style>
