@@ -55,7 +55,7 @@ const router = createRouter({
 });
 
 router.beforeEach((to, from, next) => {
-  document.title = to.meta.title ? `${to.meta.title} | SocialApp` : 'SocialApp';
+  document.title = to.meta.title ? `${to.meta.title} | Footgram` : 'Footgram';
 
   const isAuthenticated = !!localStorage.getItem('token');
 

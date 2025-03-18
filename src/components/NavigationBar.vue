@@ -3,10 +3,15 @@
     <h2>Footgram.</h2>
 
     <div class="profile">
-      <div class="user-avatar">
+      <div
+        @click="$router.push(`/profile/${user?.username}`)"
+        class="user-avatar"
+      >
         {{ user?.username.charAt(0).toUpperCase() }}
       </div>
-      <a :href="`/profile/${user?.username}`" class="username">{{ user?.username }}</a>
+      <a :href="`/profile/${user?.username}`" class="username">{{
+        user?.username
+      }}</a>
     </div>
   </nav>
 </template>
@@ -44,17 +49,18 @@ nav {
   justify-content: space-between;
   border-radius: 8px;
   background-color: #222;
+  box-shadow: 0px 0px 10px 0px #00000052;
 }
 
 .profile {
-    display: flex;
-    place-items: center;
+  display: flex;
+  place-items: center;
 }
 
 .username {
-    color: whitesmoke;
-    text-decoration: none;
-    font-weight: bold;
+  color: whitesmoke;
+  text-decoration: none;
+  font-weight: bold;
 }
 
 .user-avatar {
