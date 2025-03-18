@@ -632,11 +632,11 @@ h2 {
 
 @media (max-width: 480px) {
   .post-author a{
-    max-width: 30vw;
+    max-width: 28vw;
   }
 
-  .post-time {
+  /* .post-time {
     max-width: 30vw;
-  }
+  } */
 }
 </style>

@@ -298,6 +298,9 @@ h1 {
 
 .user-details h2 {
   font-size: 1.5rem;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
   margin: 0 0 0.25rem 0;
 }
 
@@ -414,5 +417,11 @@ h1 {
 
 .logout:hover {
   background-color: #b71c1c;
+}
+
+@media (max-width: 480px) {
+  .user-details h2{
+    max-width: 30vw;
+  }
 }
 </style>
