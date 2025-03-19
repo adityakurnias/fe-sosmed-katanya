@@ -1,36 +1,7 @@
 <script setup lang="ts">
-import router from "@/router";
 import { ref, onMounted } from "vue";
 import NavigationBar from "@/components/NavigationBar.vue";
-
-interface Attachment {
-  id: number;
-  storage_path: string;
-}
-
-interface User {
-  id: number;
-  full_name: string;
-  username: string;
-  bio: string | null;
-  is_private: boolean | null;
-  created_at: string;
-}
-
-interface Post {
-  id: number;
-  caption: string;
-  created_at: string;
-  deleted_at: string | null;
-  user: User;
-  attachments: Attachment[];
-}
-
-interface PostsResponse {
-  page: number;
-  size: number;
-  posts: Post[];
-}
+import type { Attachment, User, Post, PostsResponse } from "@/types/main";
 
 const user = ref(null);
 const isLoading = ref(true);
@@ -43,19 +14,16 @@ const filePreviews = ref<string[]>([]);
 const ascending = ref(true);
 
 const formatDate = (dateString: string): string => {
-  const dateObj = new Date(dateString);
+  const dateObj: Date = new Date(dateString);
+  const options: Object = {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+  };
 
-  const tanggal = dateObj.getDate();
-  const bulan = dateObj.getMonth() + 1;
-  const tahun = dateObj.getFullYear();
-  const jam = dateObj.getHours();
-  const menit = dateObj.getMinutes();
-
-  const tanggalFormat = `${tanggal < 10 ? "0" + tanggal : tanggal}-${
-    bulan < 10 ? "0" + bulan : bulan
-  }-${tahun} ${jam < 10 ? "0" + jam : jam}:${menit < 10 ? "0" + menit : menit}`;
-
-  return tanggalFormat;
+  return new Intl.DateTimeFormat('en-US', options).format(dateObj);
 };
 
 const getImageUrl = (path: string): string => {
@@ -117,8 +85,8 @@ const removeSelectedFile = (index: number) => {
 
 const sortPosts = () => {
   posts.value.sort((a, b) => {
-    const dateA = new Date(a.created_at);
-    const dateB = new Date(b.created_at);
+    const dateA: Date = new Date(a.created_at);
+    const dateB: Date = new Date(b.created_at);
     return ascending.value
       ? dateA.getTime() - dateB.getTime()
       : dateB.getTime() - dateA.getTime();
@@ -508,7 +476,6 @@ h2 {
 }
 
 .post-author a {
-  display: block;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -634,9 +601,5 @@ h2 {
   .post-author a{
     max-width: 28vw;
   }
-
-  /* .post-time {
-    max-width: 30vw;
-  } */
 }
 </style>

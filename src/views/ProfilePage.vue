@@ -2,31 +2,7 @@
 import { ref, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import FollowButton from "@/components/FollowButton.vue";
-
-interface Attachment {
-  id: number;
-  storage_path: string;
-}
-
-interface Post {
-  id: number;
-  caption: string;
-  created_at: string;
-  attachments: Attachment[];
-}
-
-interface User {
-  id: number;
-  username: string;
-  full_name: string;
-  bio: string | null;
-  is_private: boolean;
-  follow_status?: "following" | "requested" | null;
-  posts_count: number;
-  followers_count: number;
-  following_count: number;
-  posts?: Post[];
-}
+import type { Attachment, User, Post, PostsResponse } from "@/types/main";
 
 const route = useRoute();
 const router = useRouter();
@@ -74,16 +50,16 @@ const handleFollowStatusChange = (status: "following" | "requested" | null) => {
 };
 
 const formatDate = (dateString: string): string => {
-  const dateObj = new Date(dateString);
-  const tanggal = dateObj.getDate();
-  const bulan = dateObj.getMonth() + 1;
-  const tahun = dateObj.getFullYear();
-  const jam = dateObj.getHours();
-  const menit = dateObj.getMinutes();
+  const dateObj: Date = new Date(dateString);
+  const options: Object = {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+  };
 
-  return `${tanggal < 10 ? "0" + tanggal : tanggal}-${
-    bulan < 10 ? "0" + bulan : bulan
-  }-${tahun} ${jam < 10 ? "0" + jam : jam}:${menit < 10 ? "0" + menit : menit}`;
+  return new Intl.DateTimeFormat('en-US', options).format(dateObj);
 };
 
 const getImageUrl = (path: string): string => {
