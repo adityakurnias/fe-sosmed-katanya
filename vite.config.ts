@@ -22,12 +22,12 @@ export default defineConfig({
     allowedHosts: true,
     proxy: {
       '/api': {
-        target: 'http://socmed.synchronizeteams.my.id/api/v1',
+        target: 'https://socmed.synchronizeteams.my.id/api/v1',
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, ''),
       },
       '/storage': {
-        target: 'http://socmed.synchronizeteams.my.id',
+        target: 'https://socmed.synchronizeteams.my.id',
         changeOrigin: true,
       },
     },
