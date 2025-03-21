@@ -27,7 +27,7 @@ const formatDate = (dateString: string): string => {
 };
 
 const getImageUrl = (path: string): string => {
-  return `/storage/${path}`;
+  return `${import.meta.env.VITE_BASE_URL}/${path}`;
 };
 
 const fetchPosts = async () => {
@@ -40,7 +40,7 @@ const fetchPosts = async () => {
       throw new Error("Token tidak ada");
     }
 
-    const response = await fetch("/api/posts", {
+    const response = await fetch(`${import.meta.env.VITE_BASE_API_URL}/posts`, {
       headers: {
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
@@ -115,7 +115,7 @@ const createPost = async () => {
       formData.append("post_attachments[]", file);
     });
 
-    const response = await fetch("/api/posts", {
+    const response = await fetch(`${import.meta.env.VITE_BASE_API_URL}/posts`, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${token}`,

@@ -21,7 +21,7 @@ const fetchUserProfile = async () => {
   }
 
   try {
-    const response = await fetch(`/api/users/${username}`, {
+    const response = await fetch(`${import.meta.env.VITE_BASE_API_URL}/users/${username}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -63,7 +63,7 @@ const formatDate = (dateString: string): string => {
 };
 
 const getImageUrl = (path: string): string => {
-  return `/storage/${path}`;
+  return `${import.meta.env.VITE_BASE_URL}/${path}`;
 };
 
 const logout = () => {

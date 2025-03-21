@@ -31,7 +31,7 @@ const register = async () => {
   isLoading.value = true;
 
   try {
-    const response = await fetch("/api/auth/register", {
+    const response = await fetch(`${import.meta.env.VITE_BASE_API_URL}/auth/register`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -47,7 +47,7 @@ const register = async () => {
       throw new Error(data.message || "Registrasi gagal");
     }
 
-    const loginResponse = await fetch("/api/auth/login", {
+    const loginResponse = await fetch(`${import.meta.env.VITE_BASE_API_URL}/auth/login`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({

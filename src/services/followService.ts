@@ -3,13 +3,16 @@ import type { FollowResponse } from "@/types/main";
 export default {
   async followUser(username: string): Promise<FollowResponse> {
     const token = localStorage.getItem("token");
-    const response = await fetch(`/api/users/${username}/follow`, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-    });
+    const response = await fetch(
+      `${import.meta.env.VITE_BASE_API_URL}/users/${username}/follow`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      }
+    );
 
     if (!response.ok) {
       const error = await response.json();
@@ -21,12 +24,15 @@ export default {
 
   async unfollowUser(username: string): Promise<void> {
     const token = localStorage.getItem("token");
-    const response = await fetch(`/api/users/${username}/unfollow`, {
-      method: "DELETE",
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+    const response = await fetch(
+      `${import.meta.env.VITE_BASE_API_URL}/users/${username}/unfollow`,
+      {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
 
     if (!response.ok) {
       const error = await response.json();
@@ -36,11 +42,14 @@ export default {
 
   async getFollowing() {
     const token = localStorage.getItem("token");
-    const response = await fetch("/api/following", {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+    const response = await fetch(
+      `${import.meta.env.VITE_BASE_API_URL}/following`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
 
     if (!response.ok) {
       const error = await response.json();
@@ -52,11 +61,14 @@ export default {
 
   async getFollowers() {
     const token = localStorage.getItem("token");
-    const response = await fetch("/api/followers", {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+    const response = await fetch(
+      `${import.meta.env.VITE_BASE_API_URL}/followers`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
 
     if (!response.ok) {
       const error = await response.json();
