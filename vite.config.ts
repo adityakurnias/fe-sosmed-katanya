@@ -17,6 +17,7 @@ export default defineConfig({
   },
   server: {
     host: true,
+    allowedHosts: true,
     proxy: {
       '/api': {
         target: 'https://socmed.synchronizeteams.my.id/api/v1',
