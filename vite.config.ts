@@ -8,7 +8,7 @@ import vueDevTools from 'vite-plugin-vue-devtools'
 export default defineConfig({
   plugins: [
     vue(),
-    vueDevTools(),
+    vueDevTools()
   ],
   resolve: {
     alias: {
@@ -22,12 +22,12 @@ export default defineConfig({
     allowedHosts: true,
     proxy: {
       '/api': {
-        target: 'http://127.0.0.1:8000/api/v1',
+        target: 'http://socmed.synchronizeteams.my.id/api/v1',
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, ''),
       },
       '/storage': {
-        target: 'http://127.0.0.1:8000',
+        target: 'http://socmed.synchronizeteams.my.id',
         changeOrigin: true,
       },
     },
